@@ -344,7 +344,6 @@ unsigned int laserX = 40;
 unsigned int laserY = 39;
 unsigned int isEnemyKilled[5] = {1, 1, 1, 1, 1};
 
-
 int main(void){
 	
   TExaS_Init(SSI0_Real_Nokia5110_Scope);  // set system clock to 80 MHz
@@ -393,33 +392,35 @@ int main(void){
 					Nokia5110_DisplayBuffer();     // draw buffer
 			}
 			
-			laserY--;
+			laserY -= 5;
 			
 			//Enemy will be killed when laser reaches it
-			if((laserY-9 == ENEMY10H-1) && (isEnemyKilled[laserX/16] == 1))
+			if((laserY-5 == ENEMY10H-1) && (isEnemyKilled[laserX/16] == 1))
 			{
-				laserX = playerPosX + 8;  //40-32
+				laserX = playerPosX + 12;  //40-32
 				laserY = 39;
 				isEnemyKilled[laserX/16] = 0;
 				countKilledEnemies++;
 			}
 			
-			if(laserY-9 == 0)
+			if(laserY > 0 && laserY <9)
 			{
-				laserX = playerPosX + 8;  //40-32
+				laserX = playerPosX + 12;  //40-32
 				laserY = 39;
 			}
 			
-			if (!SW1 && playerPosX<80)  //SW1 moves right
+			if (!SW1 )  //SW1 moves right
 			{
-				playerPosX++;
+				playerPosX = (playerPosX + 4) % 84;
 				Nokia5110_PrintBMP(playerPosX, 47, PlayerShip0, 0);
 				Nokia5110_PrintBMP(laserX, laserY, Laser0, 0);
 			}
 			
-			if (!SW2 && playerPosX>0)
+			if (!SW2 )
 			{
-				playerPosX--;
+				playerPosX = (playerPosX - 4);
+				if(playerPosX == 0)
+					playerPosX = 84;
 				Nokia5110_PrintBMP(playerPosX, 47, PlayerShip0, 0);
 				Nokia5110_PrintBMP(laserX, laserY, Laser0, 0);
 			}	
@@ -458,7 +459,7 @@ void Timer2_Init(unsigned long period){
   TIMER2_TAPR_R = 0;            // 5) bus clock resolution
   TIMER2_ICR_R = 0x00000001;    // 6) clear timer2A timeout flag
   TIMER2_IMR_R = 0x00000001;    // 7) arm timeout interrupt
-  NVIC_PRI5_R = (NVIC_PRI5_R&0x00FFFFFF)|0x80000000; // 8) priority 4
+  NVIC_PRI5_R = (NVIC_PRI5_R&0x00FFFFFF)|0x80000000; // ?? priority 4
 // interrupts enabled in the main program after all devices initialized
 // vector number 39, interrupt number 23
   NVIC_EN0_R = 1<<23;           // 9) enable IRQ 23 in NVIC
